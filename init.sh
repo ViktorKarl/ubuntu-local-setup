@@ -33,6 +33,6 @@ fi
 
 if [[ $REPLY =~ ^[Nn]$ ]]; then
     echo "🚫 Skipping devops tools installation."
-    echo "✅ All set! Restarting your terminal running 'source ~/.bashrc'."
+    echo "✅ All set! Restarting your terminal by running 'source ~/.bashrc'."
     source ~/.bashrc
 fi

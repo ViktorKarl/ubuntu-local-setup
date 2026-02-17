@@ -17,6 +17,6 @@ fi
 # Run the DevOps tools playbook
 ansible-playbook devops-tools.yaml --ask-become-pass
 
-echo "✅ All set! Restarting your terminal running 'source ~/.bashrc'."
+echo "✅ All set! Restarting your terminal by running 'source ~/.bashrc'."
 
 source ~/.bashrc
