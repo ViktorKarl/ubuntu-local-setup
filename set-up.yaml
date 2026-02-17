@@ -36,32 +36,6 @@
           - bash-completion   # programmable completion framework
         state: present
 
-    # ── VS Code ─────────────────────────────────────────────────
-    - name: Install VS Code (Native Ubuntu Support)
-      block:
-        - name: Download VS Code GPG key (armored)
-          get_url:
-            url: https://packages.microsoft.com/keys/microsoft.asc
-            dest: /tmp/microsoft.asc
-            mode: '0644'
-
-        - name: Dearmor VS Code GPG key
-          shell: gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg /tmp/microsoft.asc
-          args:
-            creates: /etc/apt/keyrings/microsoft.gpg
-
-        - name: Add VS Code Repository
-          apt_repository:
-            repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main"
-            state: present
-            filename: vscode
-
-        - name: Install VS Code
-          apt:
-            name: code
-            update_cache: yes
-            state: present
-
     # ── Shell Configuration (run as target user) ────────────────
     - name: Check if fzf keybindings file exists
       stat:
@@ -90,7 +64,6 @@
           echo "🧹 Running: sudo apt autoremove -y" && sudo apt autoremove -y && \
           echo "🧼 Running: sudo apt autoclean" && sudo apt autoclean && \
           echo "✅ System update complete."'
-          export EDITOR=code
       become: false
 
     # ── Tab Completion ───────────────────────────────────────────
