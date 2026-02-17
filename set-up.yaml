@@ -14,7 +14,7 @@
         update_cache: yes
 
     # ── CLI Tools ───────────────────────────────────────────────
-    - name: Install Podman, CLI tools, and developer utilities
+    - name: Install CLI tools, and developer utilities
       apt:
         pkg:
           - tree
