@@ -19,4 +19,5 @@ ansible-playbook devops-tools.yaml --ask-become-pass
 
 echo "✅ All set! Restarting your terminal by running 'source ~/.bashrc'."
 
+# shellcheck disable=SC1090
 source ~/.bashrc

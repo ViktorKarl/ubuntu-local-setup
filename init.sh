@@ -34,5 +34,6 @@ fi
 if [[ $REPLY =~ ^[Nn]$ ]]; then
     echo "🚫 Skipping devops tools installation."
     echo "✅ All set! Restarting your terminal by running 'source ~/.bashrc'."
+    # shellcheck disable=SC1090
     source ~/.bashrc
 fi
