@@ -1,0 +1,8 @@
+---
+target_user: "{{ ansible_facts.env.SUDO_USER | default(lookup('env', 'USER')) }}"
+target_home: "/home/{{ target_user }}"
+
+arch_map:
+  x86_64: amd64
+  aarch64: arm64
+deb_arch: "{{ arch_map[ansible_facts.architecture] | default('amd64') }}"

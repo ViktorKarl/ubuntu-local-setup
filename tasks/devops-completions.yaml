@@ -1,0 +1,36 @@
+---
+# ── Tab Completion (DevOps tools) ───────────────────────────
+- name: Generate kubectl bash completion
+  shell: kubectl completion bash > /etc/bash_completion.d/kubectl
+  args:
+    creates: /etc/bash_completion.d/kubectl
+
+- name: Generate helm bash completion
+  shell: helm completion bash > /etc/bash_completion.d/helm
+  args:
+    creates: /etc/bash_completion.d/helm
+
+- name: Check if Terraform autocomplete already configured
+  shell: grep -q 'complete.*-C.*terraform' "{{ target_home }}/.bashrc"
+  register: tf_autocomplete_check
+  failed_when: false
+  changed_when: false
+  become: false
+
+- name: Install Terraform autocomplete
+  command: terraform -install-autocomplete
+  become: true
+  become_user: "{{ target_user }}"
+  when: tf_autocomplete_check.rc != 0
+
+- name: Add DevOps tools completion to bashrc
+  blockinfile:
+    path: "{{ target_home }}/.bashrc"
+    marker: "# {mark} ANSIBLE MANAGED DEVOPS COMPLETIONS"
+    block: |
+      # kubectl completion + alias
+      source <(kubectl completion bash)
+      complete -o default -F __start_kubectl k
+      # helm completion
+      source <(helm completion bash)
+  become: false

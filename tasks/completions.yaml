@@ -1,0 +1,17 @@
+---
+# ── Tab Completion ───────────────────────────────────────────
+- name: Add base completions to bashrc
+  blockinfile:
+    path: "{{ target_home }}/.bashrc"
+    marker: "# {mark} ANSIBLE MANAGED COMPLETIONS"
+    block: |
+      # Enable bash-completion if not already loaded
+      if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+      fi
+      # git completion (shipped with git package)
+      if [ -f /usr/share/bash-completion/completions/git ]; then
+        . /usr/share/bash-completion/completions/git
+        __git_complete g __git_main
+      fi
+  become: false

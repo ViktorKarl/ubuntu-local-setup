@@ -1,0 +1,30 @@
+---
+# ── Shell Configuration (run as target user) ────────────────
+- name: Check if fzf keybindings file exists
+  stat:
+    path: /usr/share/doc/fzf/examples/key-bindings.bash
+  register: fzf_keybindings
+
+- name: Enable fzf keybindings
+  lineinfile:
+    path: "{{ target_home }}/.bashrc"
+    line: "source /usr/share/doc/fzf/examples/key-bindings.bash"
+    create: yes
+  become: false
+  when: fzf_keybindings.stat.exists
+
+- name: Add useful bash aliases
+  blockinfile:
+    path: "{{ target_home }}/.bashrc"
+    marker: "# {mark} ANSIBLE MANAGED ALIASES"
+    block: |
+      alias ll='ls -alF'
+      alias g='git'
+      alias t='terraform'
+      alias k='kubectl'
+      alias sysupdate='echo "🔄 Running: sudo apt update" && sudo apt update && \
+      echo "⬆️ Running: sudo apt full-upgrade -y" && sudo apt full-upgrade -y && \
+      echo "🧹 Running: sudo apt autoremove -y" && sudo apt autoremove -y && \
+      echo "🧼 Running: sudo apt autoclean" && sudo apt autoclean && \
+      echo "✅ System update complete."'
+  become: false

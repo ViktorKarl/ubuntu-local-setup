@@ -1,0 +1,30 @@
+---
+# ── Azure CLI ───────────────────────────────────────────────
+- name: Install Azure CLI
+  block:
+    - name: Remove conflicting Azure CLI apt sources
+      shell: rm -f /etc/apt/sources.list.d/azure-cli.* /etc/apt/sources.list.d/microsoft-prod.* 2>/dev/null || true
+      changed_when: false
+
+    - name: Download Microsoft GPG key (armored)
+      get_url:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        dest: /tmp/microsoft-azure.asc
+        mode: '0644'
+
+    - name: Dearmor Microsoft GPG key for Azure CLI
+      shell: gpg --dearmor --yes -o /etc/apt/keyrings/microsoft-azure.gpg /tmp/microsoft-azure.asc
+      args:
+        creates: /etc/apt/keyrings/microsoft-azure.gpg
+
+    - name: Add Azure CLI repository
+      apt_repository:
+        repo: "deb [arch={{ deb_arch }} signed-by=/etc/apt/keyrings/microsoft-azure.gpg] https://packages.microsoft.com/repos/azure-cli/ {{ ansible_facts.distribution_release }} main"
+        state: present
+        filename: azure-cli
+
+    - name: Install Azure CLI
+      apt:
+        name: azure-cli
+        update_cache: yes
+        state: present

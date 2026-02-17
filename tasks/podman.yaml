@@ -1,0 +1,13 @@
+---
+# ── Podman (container engine) ───────────────────────────────
+- name: Install Podman
+  apt:
+    name: podman
+    state: present
+
+- name: Set Podman alias for Docker in .bashrc
+  lineinfile:
+    path: "{{ target_home }}/.bashrc"
+    line: "alias docker=podman"
+    create: yes
+  become: false

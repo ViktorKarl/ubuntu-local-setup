@@ -1,0 +1,28 @@
+---
+# ── System Updates ──────────────────────────────────────────
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+# ── CLI Tools ───────────────────────────────────────────────
+- name: Install CLI tools, and developer utilities
+  apt:
+    pkg:
+      - tree
+      - fzf
+      - htop
+      - curl
+      - git
+      - wget
+      - gpg
+      - ca-certificates
+      - jq               # JSON processor
+      - yq               # YAML processor
+      - ripgrep           # fast recursive grep (rg)
+      - bat               # cat with syntax highlighting
+      - unzip
+      - net-tools         # ifconfig, netstat, etc.
+      - shellcheck        # shell script linter
+      - tmux              # terminal multiplexer
+      - bash-completion   # programmable completion framework
+    state: present

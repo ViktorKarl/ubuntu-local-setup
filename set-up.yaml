@@ -3,107 +3,18 @@
   hosts: localhost
   connection: local
   become: true
-  vars:
-    target_user: "{{ ansible_facts.env.SUDO_USER | default(lookup('env', 'USER')) }}"
-    target_home: "/home/{{ target_user }}"
+  vars_files:
+    - vars/main.yaml
 
   tasks:
-    # ── System Updates ──────────────────────────────────────────
-    - name: Update apt cache
-      apt:
-        update_cache: yes
+    - include_tasks: tasks/base-tools.yaml
+      tags: [base]
 
-    # ── CLI Tools ───────────────────────────────────────────────
-    - name: Install CLI tools, and developer utilities
-      apt:
-        pkg:
-          - tree
-          - fzf
-          - htop
-          - curl
-          - git
-          - wget
-          - gpg
-          - ca-certificates
-          - jq               # JSON processor
-          - yq               # YAML processor
-          - ripgrep           # fast recursive grep (rg)
-          - bat               # cat with syntax highlighting
-          - unzip
-          - net-tools         # ifconfig, netstat, etc.
-          - shellcheck        # shell script linter
-          - tmux              # terminal multiplexer
-          - bash-completion   # programmable completion framework
-        state: present
+    - include_tasks: tasks/shell-config.yaml
+      tags: [shell]
 
-    # ── Shell Configuration (run as target user) ────────────────
-    - name: Check if fzf keybindings file exists
-      stat:
-        path: /usr/share/doc/fzf/examples/key-bindings.bash
-      register: fzf_keybindings
+    - include_tasks: tasks/completions.yaml
+      tags: [completions]
 
-    - name: Enable fzf keybindings
-      lineinfile:
-        path: "{{ target_home }}/.bashrc"
-        line: "source /usr/share/doc/fzf/examples/key-bindings.bash"
-        create: yes
-      become: false
-      when: fzf_keybindings.stat.exists
-
-    - name: Add useful bash aliases
-      blockinfile:
-        path: "{{ target_home }}/.bashrc"
-        marker: "# {mark} ANSIBLE MANAGED ALIASES"
-        block: |
-          alias ll='ls -alF'
-          alias g='git'
-          alias t='terraform'
-          alias k='kubectl'
-          alias sysupdate='echo "🔄 Running: sudo apt update" && sudo apt update && \
-          echo "⬆️ Running: sudo apt full-upgrade -y" && sudo apt full-upgrade -y && \
-          echo "🧹 Running: sudo apt autoremove -y" && sudo apt autoremove -y && \
-          echo "🧼 Running: sudo apt autoclean" && sudo apt autoclean && \
-          echo "✅ System update complete."'
-      become: false
-
-    # ── Tab Completion ───────────────────────────────────────────
-    - name: Add base completions to bashrc
-      blockinfile:
-        path: "{{ target_home }}/.bashrc"
-        marker: "# {mark} ANSIBLE MANAGED COMPLETIONS"
-        block: |
-          # Enable bash-completion if not already loaded
-          if [ -f /usr/share/bash-completion/bash_completion ]; then
-            . /usr/share/bash-completion/bash_completion
-          fi
-          # git completion (shipped with git package)
-          if [ -f /usr/share/bash-completion/completions/git ]; then
-            . /usr/share/bash-completion/completions/git
-            __git_complete g __git_main
-          fi
-      become: false
-
-    # ── Git default config ──────────────────────────────────────
-    - name: Set git default branch name
-      community.general.git_config:
-        name: init.defaultBranch
-        value: main
-        scope: global
-      become: true
-      become_user: "{{ target_user }}"
-
-    - name: Set git user name
-      community.general.git_config:
-        name: user.name
-        value: "ViktorKarl"
-        scope: global
-      become: true
-      become_user: "{{ target_user }}"
-
-    - name: Set git user email
-      community.general.git_config:
-        name: user.email
-        value: "viktorkg98@gmail.com"
-        scope: global
-      become: true
-      become_user: "{{ target_user }}"
+    - include_tasks: tasks/git-config.yaml
+      tags: [git]

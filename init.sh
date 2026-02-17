@@ -29,11 +29,8 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "📦 Installing devops tools..."
     ./devops-tools.sh
+else
+    echo "🚫 Skipping devops tools installation."
 fi
 
-if [[ $REPLY =~ ^[Nn]$ ]]; then
-    echo "🚫 Skipping devops tools installation."
-    echo "✅ All set! Restarting your terminal by running 'source ~/.bashrc'."
-    # shellcheck disable=SC1090
-    source ~/.bashrc
-fi
+echo "✅ All set! Restart your terminal or run: source ~/.bashrc"

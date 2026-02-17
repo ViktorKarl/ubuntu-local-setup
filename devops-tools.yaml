@@ -3,137 +3,24 @@
   hosts: localhost
   connection: local
   become: true
-  vars:
-    target_user: "{{ ansible_facts.env.SUDO_USER | default(lookup('env', 'USER')) }}"
-    target_home: "/home/{{ target_user }}"
+  vars_files:
+    - vars/main.yaml
 
   tasks:
-    # ── Podman (container engine) ───────────────────────────────
-    - name: Install Podman
-      apt:
-        name: podman
-        state: present
+    - include_tasks: tasks/podman.yaml
+      tags: [podman, containers]
 
-    - name: Set Podman alias for Docker in .bashrc
-      lineinfile:
-        path: "{{ target_home }}/.bashrc"
-        line: "alias docker=podman"
-        create: yes
-      become: false
+    - include_tasks: tasks/kubectl.yaml
+      tags: [kubectl, kubernetes]
 
-    # ── kubectl ─────────────────────────────────────────────────
-    - name: Get latest stable version of kubectl
-      uri:
-        url: https://dl.k8s.io/release/stable.txt
-        return_content: yes
-      register: k8s_version
+    - include_tasks: tasks/helm.yaml
+      tags: [helm, kubernetes]
 
-    - name: Download and install kubectl binary
-      get_url:
-        url: "https://dl.k8s.io/release/{{ k8s_version.content | trim }}/bin/linux/amd64/kubectl"
-        dest: /usr/local/bin/kubectl
-        mode: '0755'
-        owner: root
-        group: root
+    - include_tasks: tasks/terraform.yaml
+      tags: [terraform, iac]
 
-    # ── Helm ────────────────────────────────────────────────────
-    - name: Install Helm
-      block:
-        - name: Download Helm install script
-          get_url:
-            url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-            dest: /tmp/get_helm.sh
-            mode: '0755'
+    - include_tasks: tasks/azure-cli.yaml
+      tags: [azure, cloud]
 
-        - name: Run Helm install script
-          command: /tmp/get_helm.sh
-          args:
-            creates: /usr/local/bin/helm
-
-    # ── Terraform ───────────────────────────────────────────────
-    - name: Install Terraform
-      block:
-        - name: Download HashiCorp GPG key (armored)
-          get_url:
-            url: https://apt.releases.hashicorp.com/gpg
-            dest: /tmp/hashicorp.asc
-            mode: '0644'
-
-        - name: Dearmor HashiCorp GPG key
-          shell: gpg --dearmor --yes -o /etc/apt/keyrings/hashicorp.gpg /tmp/hashicorp.asc
-          args:
-            creates: /etc/apt/keyrings/hashicorp.gpg
-
-        - name: Add HashiCorp repository
-          apt_repository:
-            repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp.gpg] https://apt.releases.hashicorp.com {{ ansible_facts.distribution_release }} main"
-            state: present
-            filename: hashicorp
-
-        - name: Install Terraform
-          apt:
-            name: terraform
-            update_cache: yes
-            state: present
-
-    # ── Azure CLI ───────────────────────────────────────────────
-    - name: Install Azure CLI
-      block:
-        - name: Remove conflicting Azure CLI apt sources
-          shell: rm -f /etc/apt/sources.list.d/azure-cli.* /etc/apt/sources.list.d/microsoft-prod.* 2>/dev/null || true
-          changed_when: false
-
-        - name: Download Microsoft GPG key (armored)
-          get_url:
-            url: https://packages.microsoft.com/keys/microsoft.asc
-            dest: /tmp/microsoft-azure.asc
-            mode: '0644'
-
-        - name: Dearmor Microsoft GPG key for Azure CLI
-          shell: gpg --dearmor --yes -o /etc/apt/keyrings/microsoft-azure.gpg /tmp/microsoft-azure.asc
-          args:
-            creates: /etc/apt/keyrings/microsoft-azure.gpg
-
-        - name: Add Azure CLI repository
-          apt_repository:
-            repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft-azure.gpg] https://packages.microsoft.com/repos/azure-cli/ {{ ansible_facts.distribution_release }} main"
-            state: present
-            filename: azure-cli
-
-        - name: Install Azure CLI
-          apt:
-            name: azure-cli
-            update_cache: yes
-            state: present
-
-    # ── Tab Completion ──────────────────────────────────────────
-    - name: Generate kubectl bash completion
-      shell: kubectl completion bash > /etc/bash_completion.d/kubectl
-      args:
-        creates: /etc/bash_completion.d/kubectl
-
-    - name: Generate helm bash completion
-      shell: helm completion bash > /etc/bash_completion.d/helm
-      args:
-        creates: /etc/bash_completion.d/helm
-
-    - name: Install Terraform autocomplete
-      command: terraform -install-autocomplete
-      become: true
-      become_user: "{{ target_user }}"
-      args:
-        creates: "{{ target_home }}/.bashrc"
-      register: tf_autocomplete
-      failed_when: false
-
-    - name: Add DevOps tools completion to bashrc
-      blockinfile:
-        path: "{{ target_home }}/.bashrc"
-        marker: "# {mark} ANSIBLE MANAGED DEVOPS COMPLETIONS"
-        block: |
-          # kubectl completion + alias
-          source <(kubectl completion bash)
-          complete -o default -F __start_kubectl k
-          # helm completion
-          source <(helm completion bash)
-      become: false
+    - include_tasks: tasks/devops-completions.yaml
+      tags: [completions]
