@@ -1,0 +1,127 @@
+---
+- name: Complete Ubuntu Environment Setup
+  hosts: localhost
+  connection: local
+  become: true
+  vars:
+    target_user: "{{ ansible_env.SUDO_USER | default(lookup('env', 'USER')) }}"
+    target_home: "/home/{{ target_user }}"
+
+  tasks:
+    # ── System Updates ──────────────────────────────────────────
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    # ── CLI Tools ───────────────────────────────────────────────
+    - name: Install Podman, CLI tools, and developer utilities
+      apt:
+        pkg:
+          - podman
+          - tree
+          - fzf
+          - htop
+          - curl
+          - git
+          - wget
+          - gpg
+          - ca-certificates
+          - jq               # JSON processor
+          - ripgrep           # fast recursive grep (rg)
+          - bat               # cat with syntax highlighting
+          - unzip
+          - net-tools         # ifconfig, netstat, etc.
+          - shellcheck        # shell script linter
+          - tmux              # terminal multiplexer
+          - bash-completion   # programmable completion framework
+        state: present
+
+    # ── VS Code ─────────────────────────────────────────────────
+    - name: Install VS Code (Native Ubuntu Support)
+      block:
+        - name: Download VS Code GPG key (armored)
+          get_url:
+            url: https://packages.microsoft.com/keys/microsoft.asc
+            dest: /tmp/microsoft.asc
+            mode: '0644'
+
+        - name: Dearmor VS Code GPG key
+          shell: gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg /tmp/microsoft.asc
+          args:
+            creates: /etc/apt/keyrings/microsoft.gpg
+
+        - name: Add VS Code Repository
+          apt_repository:
+            repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main"
+            state: present
+            filename: vscode
+
+        - name: Install VS Code
+          apt:
+            name: code
+            update_cache: yes
+            state: present
+
+    # ── Shell Configuration (run as target user) ────────────────
+    - name: Set Podman alias for Docker in .bashrc
+      lineinfile:
+        path: "{{ target_home }}/.bashrc"
+        line: "alias docker=podman"
+        create: yes
+      become: false
+
+    - name: Check if fzf keybindings file exists
+      stat:
+        path: /usr/share/doc/fzf/examples/key-bindings.bash
+      register: fzf_keybindings
+
+    - name: Enable fzf keybindings
+      lineinfile:
+        path: "{{ target_home }}/.bashrc"
+        line: "source /usr/share/doc/fzf/examples/key-bindings.bash"
+        create: yes
+      become: false
+      when: fzf_keybindings.stat.exists
+
+    - name: Add useful bash aliases
+      blockinfile:
+        path: "{{ target_home }}/.bashrc"
+        marker: "# {mark} ANSIBLE MANAGED ALIASES"
+        block: |
+          alias ll='ls -alF'
+          alias g='git'
+          alias t='terraform'
+          alias k='kubectl'
+          alias sysupdate='echo "🔄 Running: sudo apt update" && sudo apt update && \
+          echo "⬆️ Running: sudo apt full-upgrade -y" && sudo apt full-upgrade -y && \
+          echo "🧹 Running: sudo apt autoremove -y" && sudo apt autoremove -y && \
+          echo "🧼 Running: sudo apt autoclean" && sudo apt autoclean && \
+          echo "✅ System update complete."'
+          export EDITOR=code
+      become: false
+
+    # ── Tab Completion ───────────────────────────────────────────
+    - name: Add base completions to bashrc
+      blockinfile:
+        path: "{{ target_home }}/.bashrc"
+        marker: "# {mark} ANSIBLE MANAGED COMPLETIONS"
+        block: |
+          # Enable bash-completion if not already loaded
+          if [ -f /usr/share/bash-completion/bash_completion ]; then
+            . /usr/share/bash-completion/bash_completion
+          fi
+          # git completion (shipped with git package)
+          if [ -f /usr/share/bash-completion/completions/git ]; then
+            . /usr/share/bash-completion/completions/git
+            __git_complete g __git_main
+          fi
+      become: false
+
+    # ── Git default config ──────────────────────────────────────
+    - name: Set git default branch name
+      community.general.git_config:
+        name: init.defaultBranch
+        value: main
+        scope: global
+      become: true
+      become_user: "{{ target_user }}"
