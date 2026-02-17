@@ -79,6 +79,10 @@
     # ── Azure CLI ───────────────────────────────────────────────
     - name: Install Azure CLI
       block:
+        - name: Remove conflicting Azure CLI apt sources
+          shell: rm -f /etc/apt/sources.list.d/azure-cli.* /etc/apt/sources.list.d/microsoft-prod.* 2>/dev/null || true
+          changed_when: false
+
         - name: Download Microsoft GPG key (armored)
           get_url:
             url: https://packages.microsoft.com/keys/microsoft.asc
