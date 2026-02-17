@@ -18,4 +18,6 @@ fi
 # We use --ask-become-pass so you can enter your sudo password once
 ansible-playbook set-up.yaml --ask-become-pass
 
-echo "✅ All set! Restart your terminal or run 'source ~/.bashrc'."
+echo "✅ All set! Restarting your terminal running 'source ~/.bashrc'."
+
+source ~/.bashrc
