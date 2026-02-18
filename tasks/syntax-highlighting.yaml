@@ -60,6 +60,11 @@
     mode: "0644"
     content: |
       # ── ble.sh colour / style overrides ──────────────────
+      # Disable auto-suggestions and highlighted region
+      bleopt complete_auto_complete=
+      bleopt complete_auto_history=
+      ble-face -s auto_complete fg=none
+
       # Commands recognised in PATH → bold green
       ble-face -s command_builtin     fg=green,bold
       ble-face -s command_file        fg=green,bold
@@ -67,10 +72,12 @@
       ble-face -s command_alias       fg=green,bold
       ble-face -s command_keyword     fg=cyan,bold
 
-      # Unrecognised commands → bold red (typo indicator)
-      ble-face -s command_directory   fg=blue,bold
+      # Unrecognised / errored commands → bold red (typo indicator)
       ble-face -s syntax_error        fg=red,bold
-      ble-face -s command_missing     fg=red,bold
+      ble-face -s syntax_command      fg=red,bold
+
+      # Directory-as-command (e.g. typing a dir name)
+      ble-face -s command_directory   fg=blue,bold
 
       # Arguments & options
       ble-face -s argument_option     fg=magenta
