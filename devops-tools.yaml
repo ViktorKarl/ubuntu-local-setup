@@ -7,20 +7,20 @@
     - vars/main.yaml
 
   tasks:
-    - include_tasks: tasks/podman.yaml
+    - import_tasks: tasks/podman.yaml
       tags: [podman, containers]
 
-    - include_tasks: tasks/kubectl.yaml
+    - import_tasks: tasks/kubectl.yaml
       tags: [kubectl, kubernetes]
 
-    - include_tasks: tasks/helm.yaml
+    - import_tasks: tasks/helm.yaml
       tags: [helm, kubernetes]
 
-    - include_tasks: tasks/terraform.yaml
+    - import_tasks: tasks/terraform.yaml
       tags: [terraform, iac]
 
-    - include_tasks: tasks/azure-cli.yaml
+    - import_tasks: tasks/azure-cli.yaml
       tags: [azure, cloud]
 
-    - include_tasks: tasks/devops-completions.yaml
+    - import_tasks: tasks/devops-completions.yaml
       tags: [completions]

@@ -7,17 +7,17 @@
     - vars/main.yaml
 
   tasks:
-    - include_tasks: tasks/base-tools.yaml
+    - import_tasks: tasks/base-tools.yaml
       tags: [base]
 
-    - include_tasks: tasks/shell-config.yaml
+    - import_tasks: tasks/shell-config.yaml
       tags: [shell]
 
-    - include_tasks: tasks/completions.yaml
+    - import_tasks: tasks/completions.yaml
       tags: [completions]
 
-    - include_tasks: tasks/git-config.yaml
+    - import_tasks: tasks/git-config.yaml
       tags: [git]
 
-    - include_tasks: tasks/syntax-highlighting.yaml
+    - import_tasks: tasks/syntax-highlighting.yaml
       tags: [shell, syntax]
