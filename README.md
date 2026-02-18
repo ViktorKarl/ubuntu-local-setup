@@ -2,7 +2,7 @@
 
 Ansible-based provisioning for fresh Ubuntu instances. Run once to get a fully configured development environment.
 
-## Usage
+## Usage (oneliner)
 
 ```bash
 git clone https://github.com/ViktorKarl/ubuntu-local-setup.git && cd ubuntu-local-setup && chmod +x init.sh devops-tools.sh && ./init.sh
