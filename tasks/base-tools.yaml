@@ -13,6 +13,8 @@
       - htop
       - curl
       - git
+      - gh
+      - vim
       - wget
       - gpg
       - ca-certificates
