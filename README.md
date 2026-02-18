@@ -56,3 +56,4 @@ Run specific parts with tags: `ansible-playbook set-up.yaml --ask-become-pass --
     ├── azure-cli.yaml      # Azure CLI via Microsoft repo
     └── devops-completions.yaml  # Tab completions for DevOps tools
 ```
+Happy configure :) 
