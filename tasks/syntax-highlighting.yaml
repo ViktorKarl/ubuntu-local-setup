@@ -1,0 +1,80 @@
+---
+# ── Bash Syntax Highlighting (ble.sh) ──────────────────────
+# Gives real-time colour + bold for recognised commands
+# (grep, kubectl, cat, git …) as you type.
+
+- name: Install ble.sh build dependencies
+  apt:
+    pkg:
+      - make
+      - gawk
+      - git
+    state: present
+
+- name: Clone ble.sh repository
+  git:
+    repo: https://github.com/akinomyoga/ble.sh.git
+    dest: "{{ target_home }}/.local/src/ble.sh"
+    depth: 1
+    recursive: yes
+    version: master
+    force: yes
+  become: true
+  become_user: "{{ target_user }}"
+
+- name: Build and install ble.sh
+  command:
+    cmd: make install PREFIX={{ target_home }}/.local
+    chdir: "{{ target_home }}/.local/src/ble.sh"
+  become: true
+  become_user: "{{ target_user }}"
+  args:
+    creates: "{{ target_home }}/.local/share/blesh/ble.sh"
+
+- name: Source ble.sh at the TOP of .bashrc (ble-attach)
+  lineinfile:
+    path: "{{ target_home }}/.bashrc"
+    line: "[[ $- == *i* ]] && source {{ target_home }}/.local/share/blesh/ble.sh --noattach"
+    insertbefore: BOF
+    create: yes
+  become: false
+
+- name: Attach ble.sh at the END of .bashrc
+  lineinfile:
+    path: "{{ target_home }}/.bashrc"
+    line: "[[ ${BLE_VERSION-} ]] && ble-attach"
+    insertafter: EOF
+    create: yes
+  become: false
+
+- name: Create ble.sh config directory
+  file:
+    path: "{{ target_home }}/.config/blesh"
+    state: directory
+    mode: "0755"
+  become: false
+
+- name: Configure ble.sh syntax highlighting colours
+  copy:
+    dest: "{{ target_home }}/.config/blesh/init.sh"
+    mode: "0644"
+    content: |
+      # ── ble.sh colour / style overrides ──────────────────
+      # Commands recognised in PATH → bold green
+      ble-face -s command_builtin     fg=green,bold
+      ble-face -s command_file        fg=green,bold
+      ble-face -s command_function    fg=green,bold
+      ble-face -s command_alias       fg=green,bold
+      ble-face -s command_keyword     fg=cyan,bold
+
+      # Unrecognised commands → bold red (typo indicator)
+      ble-face -s command_directory   fg=blue,bold
+      ble-face -s syntax_error        fg=red,bold
+      ble-face -s command_missing     fg=red,bold
+
+      # Arguments & options
+      ble-face -s argument_option     fg=magenta
+      ble-face -s filename_directory  fg=blue,bold,underline
+      ble-face -s filename_other      fg=white
+    force: no                         # keep user edits
+  become: false
