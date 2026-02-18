@@ -36,6 +36,7 @@ ansible-playbook devops-tools.yaml --ask-become-pass --tags kubectl,helm
 | curl | `curl` | URL transfer tool |
 | wget | `wget` | File downloader |
 | git | `git` | Version control |
+| gh  | `gh` | github cli |
 | gpg | `gpg` | GNU Privacy Guard |
 | ca-certificates | — | Common CA certificates |
 | jq | `jq` | JSON processor |
