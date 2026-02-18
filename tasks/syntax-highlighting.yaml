@@ -60,9 +60,10 @@
     mode: "0644"
     content: |
       # ── ble.sh colour / style overrides ──────────────────
-      # Disable auto-suggestions and highlighted region
+      # Disable auto-suggestions and [ble: exit N] marker
       bleopt complete_auto_complete=
       bleopt complete_auto_history=
+      bleopt exec_errexit_mark=
       ble-face -s auto_complete fg=none
 
       # Commands recognised in PATH → bold green
