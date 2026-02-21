@@ -1,0 +1,11 @@
+---
+- name: GitHub Copilot CLI Setup
+  hosts: localhost
+  connection: local
+  become: true
+  vars_files:
+    - vars/main.yaml
+
+  tasks:
+    - import_tasks: tasks/copilot-cli.yaml
+      tags: [copilot, github]

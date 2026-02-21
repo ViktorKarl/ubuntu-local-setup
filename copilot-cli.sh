@@ -1,0 +1,20 @@
+#!/bin/bash
+set -e
+
+echo "🚀 Installing GitHub Copilot CLI..."
+
+# Ensure /etc/apt/keyrings exists for modern GPG handling
+sudo mkdir -p -m 755 /etc/apt/keyrings
+
+# Install Ansible if not present
+if ! command -v ansible &> /dev/null; then
+    sudo apt update
+    sudo apt install -y software-properties-common
+    sudo add-apt-repository --yes --update ppa:ansible/ansible
+    sudo apt install -y ansible
+fi
+
+# Run the Copilot CLI playbook
+ansible-playbook copilot-cli.yaml --ask-become-pass
+
+echo "✅ GitHub Copilot CLI installed! Run 'github-copilot-cli' to get started."

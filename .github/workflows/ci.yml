@@ -33,10 +33,13 @@ jobs:
       - name: Run devops-tools.yaml
         run: ansible-playbook devops-tools.yaml --become -v
 
+      - name: Run copilot-cli.yaml
+        run: ansible-playbook copilot-cli.yaml --become -v
+
       # Verify
       - name: Verify tools
         run: |
-          for cmd in git curl jq kubectl helm terraform az podman; do
+          for cmd in git curl jq kubectl helm terraform az podman npm github-copilot-cli; do
             command -v "$cmd" && echo "✅ $cmd" || { echo "❌ $cmd missing"; exit 1; }
           done
           echo "✅ All good!"

@@ -33,4 +33,14 @@ else
     echo "🚫 Skipping devops tools installation."
 fi
 
+# Ask about GitHub Copilot CLI installation
+read -p "🤖 Do you want to install GitHub Copilot CLI? (y/n): " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "📦 Installing GitHub Copilot CLI..."
+    ./copilot-cli.sh
+else
+    echo "🚫 Skipping GitHub Copilot CLI installation."
+fi
+
 echo "✅ All set! Restart your terminal or run: source ~/.bashrc"

@@ -1,0 +1,13 @@
+---
+# ── GitHub Copilot CLI ──────────────────────────────────────
+- name: Install npm (required for Copilot CLI)
+  apt:
+    pkg:
+      - npm
+    state: present
+
+- name: Install GitHub Copilot CLI globally via npm
+  community.general.npm:
+    name: "@github/copilot-cli"
+    global: true
+    state: present
