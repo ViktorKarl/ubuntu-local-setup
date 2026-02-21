@@ -1,13 +1,10 @@
 ---
-# ── GitHub Copilot CLI ──────────────────────────────────────
-- name: Install npm (required for Copilot CLI)
-  apt:
-    pkg:
-      - npm
-    state: present
-
-- name: Install GitHub Copilot CLI globally via npm
-  community.general.npm:
-    name: "@github/copilot-cli"
-    global: true
-    state: present
+# ── GitHub Copilot CLI (gh extension) ───────────────────────
+- name: Install GitHub Copilot extension for gh CLI
+  command: gh extension install github/gh-copilot
+  args:
+    creates: "{{ target_home }}/.local/share/gh/extensions/gh-copilot"
+  become: true
+  become_user: "{{ target_user }}"
+  environment:
+    GH_TOKEN: "{{ lookup('env', 'GH_TOKEN') | default('', true) }}"

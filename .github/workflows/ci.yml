@@ -21,7 +21,7 @@ jobs:
           sudo add-apt-repository --yes --update ppa:ansible/ansible
           sudo apt-get install -y ansible
           ansible-galaxy collection install community.general
-  # Lint
+      # Lint
       - name: ShellCheck
         run: shellcheck *.sh
 
@@ -35,11 +35,26 @@ jobs:
 
       - name: Run copilot-cli.yaml
         run: ansible-playbook copilot-cli.yaml --become -v
+        env:
+          GH_TOKEN: ${{ github.token }}
 
-      # Verify
-      - name: Verify tools
+      # Verify all installed binaries
+      - name: Verify base tools
         run: |
-          for cmd in git curl jq kubectl helm terraform az podman npm github-copilot-cli; do
+          for cmd in tree fzf htop curl git gh vim wget gpg jq yq rg batcat unzip netstat shellcheck tmux; do
             command -v "$cmd" && echo "✅ $cmd" || { echo "❌ $cmd missing"; exit 1; }
           done
+
+      - name: Verify devops tools
+        run: |
+          for cmd in kubectl helm terraform az podman; do
+            command -v "$cmd" && echo "✅ $cmd" || { echo "❌ $cmd missing"; exit 1; }
+          done
+
+      - name: Verify copilot-cli
+        run: |
+          gh extension list | grep -q gh-copilot && echo "✅ gh-copilot extension" || { echo "❌ gh-copilot extension missing"; exit 1; }
+
           echo "✅ All good!"
+        env:
+          GH_TOKEN: ${{ github.token }}

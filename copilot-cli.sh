@@ -17,4 +17,4 @@ fi
 # Run the Copilot CLI playbook
 ansible-playbook copilot-cli.yaml --ask-become-pass
 
-echo "✅ GitHub Copilot CLI installed! Run 'github-copilot-cli' to get started."
+echo "✅ GitHub Copilot CLI installed! Run 'gh copilot' to get started."
