@@ -89,6 +89,16 @@ Build dependencies (`make`, `gawk`) are installed automatically. ble.sh is clone
 
 ### `devops-tools.yaml` — DevOps Tooling (optional)
 
+#### Go (tags: `go`, `golang`)
+
+| Detail | Value |
+|---|---|
+| Install | Official tarball from [go.dev](https://go.dev/dl/) (latest stable) |
+| Location | `/usr/local/go` |
+| Architecture | Auto-detected (`amd64` / `arm64`) |
+| `GOPATH` | `$HOME/go` |
+| PATH | Set via `/etc/profile.d/golang.sh` |
+
 #### Podman (tags: `podman`, `containers`)
 
 | Detail | Value |
@@ -149,6 +159,7 @@ Build dependencies (`make`, `gawk`) are installed automatically. ble.sh is clone
 ### `devops-tools.yaml`
 | Tag | Scope |
 |---|---|
+| `go`, `golang` | Go toolchain |
 | `podman`, `containers` | Podman + docker alias |
 | `kubectl`, `kubernetes` | kubectl binary |
 | `helm`, `kubernetes` | Helm 3 |
@@ -174,6 +185,7 @@ Build dependencies (`make`, `gawk`) are installed automatically. ble.sh is clone
     ├── completions.yaml         # bash-completion, git completions
     ├── git-config.yaml          # git global config
     ├── syntax-highlighting.yaml # ble.sh build, install & config
+    ├── go.yaml                  # Go toolchain
     ├── podman.yaml              # Podman + docker alias
     ├── kubectl.yaml             # kubectl binary
     ├── helm.yaml                # Helm 3
