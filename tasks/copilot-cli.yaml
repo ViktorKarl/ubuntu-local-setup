@@ -4,8 +4,8 @@
 # install will fail with "matches the name of a built-in command or alias".
 # We check first and only install the extension when it isn't built-in.
 
-- name: Check if gh copilot is already available
-  command: gh copilot --help
+- name: Check if gh-copilot extension is installed
+  shell: gh extension list | grep -q gh-copilot
   register: gh_copilot_check
   changed_when: false
   failed_when: false
