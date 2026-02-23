@@ -1,5 +1,19 @@
 ---
 # ── GitHub Copilot CLI (gh extension) ───────────────────────
+# In newer gh versions, `copilot` is a built-in command and the extension
+# install will fail with "matches the name of a built-in command or alias".
+# We check first and only install the extension when it isn't built-in.
+
+- name: Check if gh copilot is already available
+  command: gh copilot --help
+  register: gh_copilot_check
+  changed_when: false
+  failed_when: false
+  become: true
+  become_user: "{{ target_user }}"
+  environment:
+    GH_TOKEN: "{{ lookup('env', 'GH_TOKEN') | default('', true) }}"
+
 - name: Install GitHub Copilot extension for gh CLI
   command: gh extension install github/gh-copilot
   args:
@@ -8,3 +22,4 @@
   become_user: "{{ target_user }}"
   environment:
     GH_TOKEN: "{{ lookup('env', 'GH_TOKEN') | default('', true) }}"
+  when: gh_copilot_check.rc != 0
