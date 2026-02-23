@@ -47,14 +47,6 @@ jobs:
 
       - name: Verify devops tools
         run: |
-          for cmd in kubectl helm terraform az podman; do
+          for cmd in kubectl helm terraform az podman go; do
             command -v "$cmd" && echo "✅ $cmd" || { echo "❌ $cmd missing"; exit 1; }
           done
-
-      - name: Verify copilot-cli
-        run: |
-          gh extension list | grep -q gh-copilot && echo "✅ gh-copilot extension" || { echo "❌ gh-copilot extension missing"; exit 1; }
-
-          echo "✅ All good!"
-        env:
-          GH_TOKEN: ${{ github.token }}

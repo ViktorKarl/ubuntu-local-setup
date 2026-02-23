@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Installing DevOps tools (kubectl, podman, Helm, Terraform)..."
+echo "🚀 Installing DevOps tools (kubectl, podman, Helm, Terraform, Go)..."
 
 # Ensure /etc/apt/keyrings exists for modern GPG handling
 sudo mkdir -p -m 755 /etc/apt/keyrings

@@ -1,0 +1,53 @@
+---
+# ── Go ──────────────────────────────────────────────────────
+- name: Install Go
+  block:
+    - name: Determine latest Go version
+      uri:
+        url: https://go.dev/VERSION?m=text
+        return_content: yes
+      register: go_latest
+
+    - name: Set Go version fact
+      set_fact:
+        go_version: "{{ go_latest.content.split('\n') | first }}"
+
+    - name: Check current Go version
+      command: /usr/local/go/bin/go version
+      register: go_current
+      changed_when: false
+      failed_when: false
+
+    - name: Download Go tarball
+      get_url:
+        url: "https://go.dev/dl/{{ go_version }}.linux-{{ deb_arch }}.tar.gz"
+        dest: "/tmp/{{ go_version }}.linux-{{ deb_arch }}.tar.gz"
+        mode: '0644'
+      when: go_current.rc != 0 or go_version not in (go_current.stdout | default(''))
+
+    - name: Remove existing Go installation
+      file:
+        path: /usr/local/go
+        state: absent
+      when: go_current.rc != 0 or go_version not in (go_current.stdout | default(''))
+
+    - name: Extract Go to /usr/local
+      unarchive:
+        src: "/tmp/{{ go_version }}.linux-{{ deb_arch }}.tar.gz"
+        dest: /usr/local
+        remote_src: yes
+      when: go_current.rc != 0 or go_version not in (go_current.stdout | default(''))
+
+    - name: Ensure Go is on PATH via /etc/profile.d
+      copy:
+        dest: /etc/profile.d/golang.sh
+        content: |
+          export PATH=$PATH:/usr/local/go/bin
+          export GOPATH=$HOME/go
+          export PATH=$PATH:$GOPATH/bin
+        mode: '0644'
+
+    - name: Clean up Go tarball
+      file:
+        path: "/tmp/{{ go_version }}.linux-{{ deb_arch }}.tar.gz"
+        state: absent

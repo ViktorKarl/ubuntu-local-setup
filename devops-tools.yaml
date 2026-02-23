@@ -1,5 +1,5 @@
 ---
-- name: DevOps Tools Setup (kubectl, Helm, Terraform)
+- name: DevOps Tools Setup (kubectl, Helm, Terraform, Go)
   hosts: localhost
   connection: local
   become: true
@@ -7,6 +7,9 @@
     - vars/main.yaml
 
   tasks:
+    - import_tasks: tasks/go.yaml
+      tags: [go, golang]
+
     - import_tasks: tasks/podman.yaml
       tags: [podman, containers]
 
