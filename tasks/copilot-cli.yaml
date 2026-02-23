@@ -4,9 +4,9 @@
 # install will fail with "matches the name of a built-in command or alias".
 # We check first and only install the extension when it isn't built-in.
 
-- name: Check if gh-copilot extension is installed
-  shell: gh extension list | grep -q gh-copilot
-  register: gh_copilot_check
+- name: Check if gh copilot is available (built-in or extension)
+  command: gh copilot --help
+  register: gh_copilot_builtin
   changed_when: false
   failed_when: false
   become: true
@@ -22,4 +22,4 @@
   become_user: "{{ target_user }}"
   environment:
     GH_TOKEN: "{{ lookup('env', 'GH_TOKEN') | default('', true) }}"
-  when: gh_copilot_check.rc != 0
+  when: gh_copilot_builtin.rc != 0
