@@ -27,4 +27,5 @@
       - shellcheck        # shell script linter
       - tmux              # terminal multiplexer
       - bash-completion   # programmable completion framework
+      - wslu              # WSL utilities package (provides wslview)
     state: present

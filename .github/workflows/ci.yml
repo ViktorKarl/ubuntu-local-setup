@@ -41,7 +41,7 @@ jobs:
       # Verify all installed binaries
       - name: Verify base tools
         run: |
-          for cmd in tree fzf htop curl git gh vim wget gpg jq yq rg batcat unzip netstat shellcheck tmux; do
+          for cmd in tree fzf htop curl git gh vim wget gpg jq yq rg batcat unzip netstat shellcheck tmux wslview; do
             command -v "$cmd" && echo "✅ $cmd" || { echo "❌ $cmd missing"; exit 1; }
           done
 

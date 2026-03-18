@@ -13,6 +13,13 @@
   become: false
   when: fzf_keybindings.stat.exists
 
+- name: Set default browser helper for WSL
+  lineinfile:
+    path: "{{ target_home }}/.bashrc"
+    line: "export BROWSER=wslview"
+    create: yes
+  become: false
+
 - name: Add useful bash aliases
   blockinfile:
     path: "{{ target_home }}/.bashrc"

@@ -48,6 +48,7 @@ ansible-playbook devops-tools.yaml --ask-become-pass --tags kubectl,helm
 | shellcheck | `shellcheck` | Shell script linter |
 | tmux | `tmux` | Terminal multiplexer |
 | bash-completion | — | Programmable completion framework |
+| wslu | `wslview` | WSL utilities package; includes browser bridge command |
 
 #### Shell Config (tag: `shell`)
 
@@ -56,6 +57,7 @@ ansible-playbook devops-tools.yaml --ask-become-pass --tags kubectl,helm
 | Aliases | `ll` → `ls -alF`, `g` → `git`, `t` → `terraform`, `k` → `kubectl` |
 | `sysupdate` alias | Runs `apt update`, `full-upgrade`, `autoremove`, `autoclean` in sequence |
 | fzf keybindings | `Ctrl+R` history search, `Ctrl+T` file search, `Alt+C` cd into directory |
+| Browser command | `export BROWSER=wslview` added to `~/.bashrc` |
 
 #### Syntax Highlighting (tags: `shell`, `syntax`)
 
