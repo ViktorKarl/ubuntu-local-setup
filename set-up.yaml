@@ -21,3 +21,6 @@
 
     - import_tasks: tasks/syntax-highlighting.yaml
       tags: [shell, syntax]
+
+    - import_tasks: tasks/vscode-extensions.yaml
+      tags: [vscode, ide]

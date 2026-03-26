@@ -1,0 +1,75 @@
+---
+# ── VS Code Extensions (run as target user) ─────────────────
+- name: Check if VS Code CLI is available
+  command: command -v code
+  register: vscode_code_cli_check
+  changed_when: false
+  failed_when: false
+  become: true
+  become_user: "{{ target_user }}"
+
+- name: Check if VS Code CLI is functional
+  command: code --version
+  register: vscode_code_version
+  changed_when: false
+  failed_when: false
+  become: true
+  become_user: "{{ target_user }}"
+  environment:
+    HOME: "{{ target_home }}"
+  when: vscode_code_cli_check.rc == 0
+
+- name: Set VS Code CLI readiness fact
+  set_fact:
+    vscode_cli_ready: "{{ (vscode_code_cli_check.rc == 0) and (vscode_code_version.rc | default(1) == 0) }}"
+
+- name: Skip VS Code extension install when CLI is unavailable
+  debug:
+    msg: "Skipping VS Code extension installation because `code` CLI is unavailable or not initialized for {{ target_user }}."
+  when: not vscode_cli_ready
+
+- name: List installed VS Code extensions
+  command: code --list-extensions
+  register: vscode_installed_extensions_raw
+  changed_when: false
+  failed_when: false
+  become: true
+  become_user: "{{ target_user }}"
+  environment:
+    HOME: "{{ target_home }}"
+  when: vscode_cli_ready
+
+- name: Build installed extension set
+  set_fact:
+    vscode_installed_extensions: >-
+      {{
+        vscode_installed_extensions_raw.stdout_lines
+        | default([])
+        | map('trim')
+        | reject('equalto', '')
+        | reject('search', ':')
+        | list
+      }}
+  when: vscode_cli_ready
+
+- name: Install missing baseline VS Code extensions
+  command: code --install-extension {{ item }} --force
+  register: vscode_extension_install_result
+  changed_when: vscode_extension_install_result.rc == 0
+  failed_when: false
+  become: true
+  become_user: "{{ target_user }}"
+  environment:
+    HOME: "{{ target_home }}"
+  loop: "{{ vscode_extensions | default([]) }}"
+  when:
+    - vscode_cli_ready
+    - item not in (vscode_installed_extensions | default([]))
+
+- name: Report VS Code extension install failures without failing setup
+  debug:
+    msg: "VS Code extension install failed for {{ item.item }} (rc={{ item.rc }})."
+  loop: "{{ vscode_extension_install_result.results | default([]) }}"
+  when:
+    - vscode_cli_ready
+    - item.rc != 0

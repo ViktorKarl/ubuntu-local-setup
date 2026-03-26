@@ -6,3 +6,17 @@ arch_map:
   x86_64: amd64
   aarch64: arm64
 deb_arch: "{{ arch_map[ansible_facts.architecture] | default('amd64') }}"
+
+# Baseline VS Code extensions installed for the target user when `code` CLI is available.
+vscode_extensions:
+  - astro-build.astro-vscode
+  - github.copilot-chat
+  - github.vscode-github-actions
+  - hashicorp.terraform
+  - mechatroner.rainbow-csv
+  - ms-python.debugpy
+  - ms-python.python
+  - ms-python.vscode-pylance
+  - ms-python.vscode-python-envs
+  - oderwat.indent-rainbow
+  - unifiedjs.vscode-mdx

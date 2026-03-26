@@ -87,6 +87,15 @@ Build dependencies (`make`, `gawk`) are installed automatically. ble.sh is clone
 | `user.name` | `ViktorKarl` |
 | `user.email` | `viktorkg98@gmail.com` |
 
+#### VS Code Extensions (tags: `vscode`, `ide`)
+
+| Feature | Detail |
+|---|---|
+| Scope | Installs a repo-managed baseline extension list for the target user |
+| Source of truth | `vscode_extensions` in `vars/main.yaml` |
+| Behavior | Installs only missing extensions (idempotent) |
+| Missing `code` CLI | Non-fatal skip with an explicit log message |
+
 ---
 
 ### `devops-tools.yaml` — DevOps Tooling (optional)
@@ -157,6 +166,7 @@ Build dependencies (`make`, `gawk`) are installed automatically. ble.sh is clone
 | `syntax` | ble.sh syntax highlighting only |
 | `completions` | bash-completion, git completions |
 | `git` | Global git configuration |
+| `vscode`, `ide` | VS Code extension baseline sync |
 
 ### `devops-tools.yaml`
 | Tag | Scope |
@@ -187,6 +197,7 @@ Build dependencies (`make`, `gawk`) are installed automatically. ble.sh is clone
     ├── completions.yaml         # bash-completion, git completions
     ├── git-config.yaml          # git global config
     ├── syntax-highlighting.yaml # ble.sh build, install & config
+    ├── vscode-extensions.yaml   # VS Code extension baseline installation
     ├── go.yaml                  # Go toolchain
     ├── podman.yaml              # Podman + docker alias
     ├── kubectl.yaml             # kubectl binary
@@ -195,5 +206,15 @@ Build dependencies (`make`, `gawk`) are installed automatically. ble.sh is clone
     ├── azure-cli.yaml           # Azure CLI via Microsoft repo
     └── devops-completions.yaml  # Tab completions for DevOps tools
 ```
+
+## VS Code Extension Baseline Maintenance
+
+Refresh the baseline list in `vars/main.yaml` when your extension set changes:
+
+```bash
+code --list-extensions | sed '/^\s*$/d' | sort -u
+```
+
+Copy the output IDs into `vscode_extensions` in `vars/main.yaml` and commit the update.
 
 Happy configuring! 

@@ -30,6 +30,23 @@ jobs:
       - name: Run set-up.yaml
         run: ansible-playbook set-up.yaml --become -v
 
+      - name: Run set-up.yaml with VS Code tag (pass 1)
+        run: ansible-playbook set-up.yaml --become -v --tags vscode | tee /tmp/vscode-pass1.log
+
+      - name: Run set-up.yaml with VS Code tag (pass 2)
+        run: ansible-playbook set-up.yaml --become -v --tags vscode | tee /tmp/vscode-pass2.log
+
+      - name: Validate VS Code task behavior
+        run: |
+          if grep -q "Skipping VS Code extension installation" /tmp/vscode-pass1.log; then
+            echo "VS Code CLI unavailable or not initialized in CI; validating skip path..."
+            grep -q "Skipping VS Code extension installation" /tmp/vscode-pass2.log
+          else
+            recap_line="$(grep -E 'localhost\s*:.*changed=' /tmp/vscode-pass2.log | tail -n 1)"
+            echo "Second VS Code-tag recap: $recap_line"
+            echo "$recap_line" | grep -Eq 'changed=0\b'
+          fi
+
       - name: Run devops-tools.yaml
         run: ansible-playbook devops-tools.yaml --become -v
 
